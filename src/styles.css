@@ -1,0 +1,51 @@
+@import 'tailwindcss';
+
+@import '@fontsource-variable/inter/wght.css';
+@theme inline {
+    --font-sans: 'Inter Variable', sans-serif;
+  /* Фоновые цвета */
+    --color-bg: #faf7f2;
+    --color-surface: #ffffff;
+    --color-surface-2: #f3efe8;
+    
+    --color-sidebar: #3D2B1A;
+    
+    /* Границы */
+    --color-border: #e8e0d4;
+    
+    /* Текст */
+    --color-text: #2c2416;
+    --color-text-2: #6b5d4d;
+    --color-text-3: #9e9182;
+    
+    /* Основная палитра */
+    --color-primary: #c8842e;
+    --color-primary-light: #f5deb3;
+    --color-primary-dark: #a06a1e;
+    
+    /* Статусы / Семантические цвета */
+    --color-success: #3a9e5c;
+    --color-success-bg: #e8f5ee;
+    --color-warning: #d4910a;
+    --color-warning-bg: #fef8e7;
+    --color-danger: #c0392b;
+    --color-danger-bg: #fdecea;
+    --color-info: #2e86c8;
+    --color-info-bg: #e7f1fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
