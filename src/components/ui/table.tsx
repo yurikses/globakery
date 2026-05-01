@@ -1,31 +1,31 @@
-interface TableProps {
-  headers?: string[]
-  data?: Record<string, string>[]
+interface TableProps<T extends string> {
+  headers: T[]
+  data?: Record<T, string>[]
 }
 
-export function Table({ headers = [], data = [] }: TableProps) {
-  // Дефолтные заголовки на случай, если они не переданы
-  const tableHeaders =
-    headers.length > 0 ? headers : ['Название', 'Адрес', 'Статус', 'Действия']
-
+export function Table<T extends string>({ headers, data = [] }: TableProps<T>) {
   return (
     <table className="w-full text-left rounded-lg overflow-hidden border border-border bg-surface">
       <thead>
         <tr className="border-b border-border text-xs text-text-3 uppercase tracking-wide">
-          {tableHeaders.map((header, index) => (
+          {headers.map((header, index) => (
             <th key={index} className="p-2">
               {header}
             </th>
           ))}
+          {/* Статичный заголовок для действий добавляем вручную */}
+          <th className="p-2">Действия</th>
         </tr>
       </thead>
       <tbody>
         {data.length > 0 ? (
-          data.map((row, index) => <TableRow key={index} data={row} />)
+          data.map((row, index) => (
+            <TableRow key={index} data={row} headers={headers} />
+          ))
         ) : (
           <tr>
             <td
-              colSpan={tableHeaders.length}
+              colSpan={headers.length + 1}
               className="p-8 text-center text-sm text-text-3"
             >
               Нет данных
@@ -37,30 +37,32 @@ export function Table({ headers = [], data = [] }: TableProps) {
   )
 }
 
-interface TableRowProps {
-  data: Record<string, string>
+interface TableRowProps<T extends string> {
+  data: Record<T, string>
+  headers: T[]
 }
 
-function TableRow({ data }: TableRowProps) {
-  if (!data || Object.keys(data).length === 0) {
+function TableRow<T extends string>({ data, headers }: TableRowProps<T>) {
+  if (Object.keys(data).length === 0) {
     return null
   }
 
-  // Получаем значения объекта для рендера ячеек
-  const cells = Object.values(data)
-
   return (
     <tr className="border-b border-border last:border-0 hover:bg-surface-2 transition-colors">
-      {cells.map((cellValue, index) => (
+      {/*
+        Вместо Object.values(data) мы перебираем headers и берем значения по ключу.
+        Это гарантирует, что колонки будут идти ровно в том порядке, в котором переданы заголовки!
+      */}
+      {headers.map((header, index) => (
         <td
           key={index}
           className={`p-2 text-sm ${index === 0 ? 'text-text font-semibold' : 'text-text-2'}`}
         >
-          {cellValue}
+          {data[header]}
         </td>
       ))}
 
-      {/* Статичная колонка с действиями (если таблица подразумевает действия) */}
+      {/* Статичная колонка с действиями */}
       <td className="p-2 text-sm">
         <button className="text-info hover:underline transition-all">
           Редактировать
