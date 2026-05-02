@@ -1,9 +1,16 @@
+import { Button } from "./button"
+
 interface TableProps<T extends string> {
   headers: T[]
   data?: Record<T, string>[]
+  actions: 'all' | 'edit' | 'delete' | 'none'
 }
 
-export function Table<T extends string>({ headers, data = [] }: TableProps<T>) {
+export function Table<T extends string>({
+  headers,
+  data = [],
+  actions = 'all',
+}: TableProps<T>) {
   return (
     <table className="w-full text-left rounded-lg overflow-hidden border border-border bg-surface">
       <thead>
@@ -20,7 +27,12 @@ export function Table<T extends string>({ headers, data = [] }: TableProps<T>) {
       <tbody>
         {data.length > 0 ? (
           data.map((row, index) => (
-            <TableRow key={index} data={row} headers={headers} />
+            <TableRow
+              key={index}
+              data={row}
+              headers={headers}
+              actions={actions}
+            />
           ))
         ) : (
           <tr>
@@ -40,9 +52,10 @@ export function Table<T extends string>({ headers, data = [] }: TableProps<T>) {
 interface TableRowProps<T extends string> {
   data: Record<T, string>
   headers: T[]
+  actions: 'all' | 'edit' | 'delete' | 'none'
 }
 
-function TableRow<T extends string>({ data, headers }: TableRowProps<T>) {
+function TableRow<T extends string>({ data, headers, actions }: TableRowProps<T>) {
   if (Object.keys(data).length === 0) {
     return null
   }
@@ -63,13 +76,22 @@ function TableRow<T extends string>({ data, headers }: TableRowProps<T>) {
       ))}
 
       {/* Статичная колонка с действиями */}
-      <td className="p-2 text-sm">
-        <button className="text-info hover:underline transition-all">
-          Редактировать
-        </button>
-        <button className="text-danger hover:underline ml-4 transition-all">
-          Удалить
-        </button>
+      <td className="p-2 text-sm flex gap-2">
+        { actions === 'all' || actions === 'edit' ? (
+           <Button variant="ghost" className="text-info">
+             Редактировать
+           </Button>
+        ) : null}
+
+        { actions === 'all' || actions === 'delete' ? (
+           <Button variant="ghost" className="text-danger">
+             Удалить
+           </Button>
+        ) : null}
+
+         { actions === 'none' ? (
+           <span className="text-text-3">Нет действий</span>
+         ) : null}
       </td>
     </tr>
   )

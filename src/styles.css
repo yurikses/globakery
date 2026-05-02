@@ -2,36 +2,60 @@
 
 @import '@fontsource-variable/inter/wght.css';
 @theme inline {
-    --font-sans: 'Inter Variable', sans-serif;
+  --font-sans: 'Inter Variable', sans-serif;
   /* Фоновые цвета */
-    --color-bg: #faf7f2;
-    --color-surface: #ffffff;
-    --color-surface-2: #f3efe8;
-    
-    --color-sidebar: #3D2B1A;
-    
-    /* Границы */
-    --color-border: #e8e0d4;
-    
-    /* Текст */
-    --color-text: #2c2416;
-    --color-text-2: #6b5d4d;
-    --color-text-3: #9e9182;
-    
-    /* Основная палитра */
-    --color-primary: #c8842e;
-    --color-primary-light: #f5deb3;
-    --color-primary-dark: #a06a1e;
-    
-    /* Статусы / Семантические цвета */
-    --color-success: #3a9e5c;
-    --color-success-bg: #e8f5ee;
-    --color-warning: #d4910a;
-    --color-warning-bg: #fef8e7;
-    --color-danger: #c0392b;
-    --color-danger-bg: #fdecea;
-    --color-info: #2e86c8;
-    --color-info-bg: #e7f1fa;
+  --color-bg: #faf7f2;
+  --color-surface: #ffffff;
+  --color-surface-2: #f3efe8;
+
+  --color-sidebar: #3d2b1a;
+
+  /* Границы */
+  --color-border: #e8e0d4;
+
+  /* Текст */
+  --color-text: #2c2416;
+  --color-text-2: #6b5d4d;
+  --color-text-3: #9e9182;
+
+  /* Основная палитра */
+  --color-primary: #c8842e;
+  --color-primary-light: #f5deb3;
+  --color-primary-dark: #a06a1e;
+
+  /* Опасность / Danger */
+  --color-danger: #c0392b;
+  --color-danger-light: #e74c3c;
+  --color-danger-dark: #a5281b;
+  --color-danger-bg: #fdecea;
+
+  /* Призрачные элементы / Ghost */
+  --color-ghost: transparent;
+  --color-ghost-hover: rgba(
+    44,
+    36,
+    22,
+    0.06
+  ); /* На основе --color-text с прозрачностью 6% */
+  --color-ghost-active: rgba(
+    44,
+    36,
+    22,
+    0.12
+  ); /* На основе --color-text с прозрачностью 12% */
+
+  /* Статусы / Семантические цвета */
+  --color-success: #3a9e5c;
+  --color-success-dark: #2b7a45;
+  --color-success-bg: #e8f5ee;
+
+  --color-warning: #d4910a;
+  --color-warning-dark: #a36f08;
+  --color-warning-bg: #fef8e7;
+
+  --color-info: #2e86c8;
+  --color-info-dark: #216396;
+  --color-info-bg: #e7f1fa;
 }
 
 * {

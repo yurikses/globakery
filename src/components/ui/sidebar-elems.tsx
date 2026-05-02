@@ -1,13 +1,13 @@
 import { cn } from '#/lib/utils'
-import { Link, useLocation } from '@tanstack/react-router'
+import { Link, useLocation, type LinkProps } from '@tanstack/react-router'
 import type { LucideIcon } from 'lucide-react'
 import type { JSX } from 'react'
 
 
-interface SideBarLinkProps extends React.ComponentPropsWithoutRef<'a'> {
-  to: string
+interface SideBarLinkProps extends LinkProps {
   icon: LucideIcon
   text: React.ReactNode
+  className?: string
 }
 
 export function SideBarLink({ to, icon: Icon, text, className }: SideBarLinkProps) {
