@@ -13,7 +13,7 @@ const button = tv({
       ghost: 'bg-ghost text-text hover:bg-ghost-hover active:bg-ghost-active',
     },
     size: {
-      icon: 'w-10 h-10 flex items-center justify-center',
+      icon: 'w-8 h-8 flex items-center justify-center',
       default: 'h-8 px-4',
     },
   },

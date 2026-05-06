@@ -1,5 +1,6 @@
 import { cn } from '#/lib/utils'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv  } from 'tailwind-variants'
+import type {VariantProps} from 'tailwind-variants';
 
 const badge = tv({
   base: 'inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap w-fit transition-colors',
@@ -31,7 +32,8 @@ const badge = tv({
   },
 })
 
-// Наследуем стандартные HTML-атрибуты для span и пропсы из tailwind-variants
+export type BadgeVariants = VariantProps<typeof badge>['variant']
+
 interface BadgeProps
   extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badge> {
   value?: string

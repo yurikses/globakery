@@ -1,7 +1,7 @@
 import { UserSideInfo } from '#/components/auth/user-sidebar'
 import { SideBarLink, SideBarSection } from '#/components/ui/sidebar-elems'
 import { createFileRoute, Outlet, Link } from '@tanstack/react-router'
-import { HomeIcon, Factory, User, Box, PackageOpen } from 'lucide-react'
+import { HomeIcon, Factory, User, Box, PackageOpen, CirclePile } from 'lucide-react'
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardLayout,
@@ -26,6 +26,7 @@ function DashboardLayout() {
           <SideBarLink to="/dashboard/factories" icon={Factory} text="Заводы" />
           <SideBarLink to="/dashboard/users" icon={User} text="Пользователи" />
           <SideBarLink to="/dashboard/stock" icon={Box} text="Склад" />
+          <SideBarLink to="/dashboard/products" icon={CirclePile} text="Изделия" />
           <SideBarLink to="/dashboard/batches" icon={PackageOpen} text="Партии" />
         </SideBarSection>
         

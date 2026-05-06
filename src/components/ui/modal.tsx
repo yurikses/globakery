@@ -1,5 +1,6 @@
 import { Dialog } from 'radix-ui'
 import { Button } from './button'
+import { X } from 'lucide-react'
 
 interface ModalProps {
   open: boolean
@@ -7,6 +8,7 @@ interface ModalProps {
   title?: string
   description?: string
   children?: React.ReactNode
+  buttonText?: string
 }
 
 export function ModalWindow(props: ModalProps) {
@@ -14,15 +16,18 @@ export function ModalWindow(props: ModalProps) {
     <Dialog.Root open={props.open} onOpenChange={props.onOpenChange}>
       <Dialog.Trigger asChild>
         <Button variant="primary" className="">
-          Edit profile
+          {props.buttonText ?? ''}
         </Button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 backdrop-blur-md" />
         <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md bg-surface p-6 w-full max-w-md">
           {props.title && (
-            <Dialog.Title className="text-text font-semibold text-sm">
+            <Dialog.Title className="text-text font-semibold  mb-4 flex justify-between items-center">
               {props.title}
+              <Button variant='ghost' size='icon' className='p-2 ' onClick={()=>props.onOpenChange(false)}>
+                <X className='size-6'/>
+              </Button>
             </Dialog.Title>
           )}
 
@@ -31,9 +36,8 @@ export function ModalWindow(props: ModalProps) {
               {props.description}
             </Dialog.Description>
           )}
-          
-          { props.children}
-          
+
+          {props.children}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
