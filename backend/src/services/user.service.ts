@@ -1,5 +1,5 @@
 import { db } from "../lib/db";
-import { user } from "../db/schema/users";
+import { rolesEnum, user } from "../db/schema/user";
 import { eq } from "drizzle-orm";
 
 export function GetUserById(id: number) {
@@ -10,11 +10,14 @@ export function GetUserByEmail(email: string) {
   return db.select().from(user).where(eq(user.email, email));
 }
 
-export function CreateUser(name: string, email: string, password: string) {
+
+export async function CreateUser(name: string, email: string, password: string) {
+  const hash = await Bun.password.hash(password);
+  
   return db.insert(user).values({
     name,
     email,
-    password,
+    password: hash,
     role: "employee",
   });
 }
@@ -23,16 +26,28 @@ export function GetAllUsers() {
   return db.select().from(user);
 }
 
-export function UpdateUser(id: number, name?: string, email?: string, password?: string, role?: typeof user.role ) {
-  return db.update(user).set({
-    name,
-    email,
-    password,
-    role,
-  }).where(eq(user.id, id));
+// Извлекаем тип возможных значений из enum
+type RoleType = (typeof rolesEnum.enumValues)[number];
+
+export function UpdateUser(
+  id: number,
+  name?: string,
+  email?: string,
+  password?: string,
+  role?: RoleType,
+) {
+  return db
+    .update(user)
+    .set({
+      name,
+      email,
+      password,
+      role,
+    })
+    .where(eq(user.id, id))
+    .returning();
 }
 
 export function DeleteUser(id: number) {
   return db.delete(user).where(eq(user.id, id));
 }
-

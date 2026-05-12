@@ -1,28 +1,190 @@
-import { Hono } from "hono";
+import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
+import {
+  GetAllUsers,
+  GetUserById,
+  CreateUser,
+  UpdateUser,
+  DeleteUser,
+} from "../services/user.service";
+import { rolesEnum } from "../db/schema/user";
 
+export const userRouter = new OpenAPIHono();
 
-export const userRouter = new Hono();
+// --- ZOD SCHEMAS ---
 
-userRouter.get("/", (c) => {
-  return c.json({ message: "Get all users" });
+const UserSchema = z
+  .object({
+    id: z.number().openapi({ example: 1 }),
+    name: z.string().openapi({ example: "John Doe" }),
+    email: z.string().email().openapi({ example: "john@example.com" }),
+    role: z.enum(rolesEnum.enumValues).openapi({ example: "employee" }),
+    factoryId: z.number().nullable().optional(),
+    contacts_info: z.string().nullable().optional(),
+    createdAt: z.string().or(z.date()).optional(),
+    updatedAt: z.string().or(z.date()).nullable().optional(),
+  })
+  .openapi("User");
+
+const CreateUserSchema = z
+  .object({
+    name: z.string().max(30).openapi({ example: "John Doe" }),
+    email: z.string().email().max(50).openapi({ example: "john@example.com" }),
+    password: z.string().min(6).openapi({ example: "secret123" }),
+  })
+  .openapi("CreateUserRequest");
+
+const UpdateUserSchema = z
+  .object({
+    name: z.string().max(30).optional().openapi({ example: "John Smith" }),
+    email: z
+      .string()
+      .email()
+      .max(50)
+      .optional()
+      .openapi({ example: "john.smith@example.com" }),
+    password: z.string().min(6).optional().openapi({ example: "newsecret" }),
+    role: z.enum(rolesEnum.enumValues).optional().openapi({ example: "admin" }),
+  })
+  .openapi("UpdateUserRequest");
+
+const ParamsIdSchema = z.object({
+  id: z.string().openapi({
+    param: { name: "id", in: "path" },
+    example: "1",
+    description: "User ID",
+  }),
 });
 
-userRouter.post("/", (c) => {
-  return c.json({ message: "Create a new user" });
+// --- OPENAPI ROUTES DEFINITIONS ---
+
+const getUsersRoute = createRoute({
+  method: "get",
+  path: "/",
+  tags: ["Users"],
+  summary: "Get all users",
+  responses: {
+    200: {
+      content: { "application/json": { schema: z.array(UserSchema) } },
+      description: "List of users",
+    },
+  },
 });
 
-userRouter.get("/:id", (c) => {
-  const { id } = c.req.param();
-  return c.json({ message: `Get user with id ${id}` });
+const getUserByIdRoute = createRoute({
+  method: "get",
+  path: "/{id}",
+  tags: ["Users"],
+  summary: "Get a user by ID",
+  request: {
+    params: ParamsIdSchema,
+  },
+  responses: {
+    200: {
+      content: { "application/json": { schema: UserSchema } },
+      description: "User found",
+    },
+    404: {
+      description: "User not found",
+    },
+  },
 });
 
-userRouter.put("/:id", (c) => {
-  const { id } = c.req.param();
-  return c.json({ message: `Update user with id ${id}` });
+const createUserRoute = createRoute({
+  method: "post",
+  path: "/",
+  tags: ["Users"],
+  summary: "Create a new user",
+  request: {
+    body: {
+      content: { "application/json": { schema: CreateUserSchema } },
+    },
+  },
+  responses: {
+    201: {
+      description: "User created successfully",
+    },
+    500: {
+      description: "Internal server error",
+    },
+  },
 });
 
-userRouter.delete("/:id", (c) => {
-  const { id } = c.req.param();
-  return c.json({ message: `Delete user with id ${id}` });
+const updateUserRoute = createRoute({
+  method: "put",
+  path: "/{id}",
+  tags: ["Users"],
+  summary: "Update user by ID",
+  request: {
+    params: ParamsIdSchema,
+    body: {
+      content: { "application/json": { schema: UpdateUserSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: "User updated successfully",
+    },
+    404: {
+      description: "User not found",
+    },
+  },
 });
 
+const deleteUserRoute = createRoute({
+  method: "delete",
+  path: "/{id}",
+  tags: ["Users"],
+  summary: "Delete user by ID",
+  request: {
+    params: ParamsIdSchema,
+  },
+  responses: {
+    200: {
+      description: "User deleted successfully",
+    },
+    404: {
+      description: "User not found",
+    },
+  },
+});
+
+// --- HANDLERS ---
+
+userRouter.openapi(getUsersRoute, async (c) => {
+  const users = await GetAllUsers();
+  return c.json(users, 200);
+});
+
+userRouter.openapi(getUserByIdRoute, async (c) => {
+  const { id } = c.req.valid("param");
+  const users = await GetUserById(Number(id));
+
+  if (!users.length) {
+    return c.text("User not found", 404);
+  }
+
+  return c.json(users[0], 200);
+});
+
+userRouter.openapi(createUserRoute, async (c) => {
+  const { name, email, password } = c.req.valid("json");
+
+  await CreateUser(name, email, password);
+  return c.text("User created", 201);
+});
+
+userRouter.openapi(updateUserRoute, async (c) => {
+  const { id } = c.req.valid("param");
+  const { name, email, password, role } = c.req.valid("json");
+
+  const result = await UpdateUser(Number(id), name, email, password, role);
+
+  return c.text("User updated", 200);
+});
+
+userRouter.openapi(deleteUserRoute, async (c) => {
+  const { id } = c.req.valid("param");
+  await DeleteUser(Number(id));
+
+  return c.text("User deleted", 200);
+});
