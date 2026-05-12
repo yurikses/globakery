@@ -28,19 +28,19 @@ type UserData = {
 const usersData: UserData[] = [
   {
     name: 'Иван Иванов',
-    position: { text: 'Менеджер', variant: 'primary' },
+    position: { text: 'Директор', variant: 'primary' },
     department: 'Завод 1',
     status: { text: 'Активный', variant: 'success' },
   },
   {
     name: 'Петр Петров',
-    position: { text: 'Рабочий', variant: 'success' },
+    position: { text: 'Сотрудник', variant: 'success' },
     department: 'Завод 2',
     status: { text: 'Активный', variant: 'success' },
   },
   {
     name: 'Сергей Сергеев',
-    position: { text: 'Инженер', variant: 'warning' },
+    position: { text: 'Сотрудник', variant: 'success' },
     department: 'Завод 1',
     status: { text: 'В отпуске', variant: 'info' },
   },

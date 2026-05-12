@@ -72,7 +72,7 @@ function RouteComponent() {
   )
 }
 
-function RecipeList() {
+export function RecipeList() {
   const [ingredients, setIngredients] = useState<
     { id: string; name: string | null; value: number | null }[]
   >([])
@@ -119,7 +119,7 @@ interface RecipeItemProps {
   onDelete: () => void
 }
 
-function RecipeItem(props: RecipeItemProps) {
+export function RecipeItem(props: RecipeItemProps) {
   return (
     <div className="flex gap-3 items-center">
       <SelectMenu

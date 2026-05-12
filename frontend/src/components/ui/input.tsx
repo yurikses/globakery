@@ -5,7 +5,7 @@ import type { ClassValue } from 'tailwind-variants'
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string
-  containerClassName: string
+  containerClassName?: string
 }
 
 export function Input({

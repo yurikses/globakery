@@ -1,6 +1,7 @@
 import { Dialog } from 'radix-ui'
 import { Button } from './button'
 import { X } from 'lucide-react'
+import type { VariantProps } from 'tailwind-variants'
 
 interface ModalProps {
   open: boolean
@@ -10,13 +11,15 @@ interface ModalProps {
   children?: React.ReactNode
   buttonText?: string
   className?: string
+  buttonVariant?: VariantProps<typeof Button>['variant']
+  buttonSize?: VariantProps<typeof Button>['size']
 }
 
 export function ModalWindow(props: ModalProps) {
   return (
     <Dialog.Root open={props.open} onOpenChange={props.onOpenChange}>
       <Dialog.Trigger asChild className={props.className}>
-        <Button variant="primary" className="">
+        <Button variant={props.buttonVariant ?? 'primary'} size={props.buttonSize ?? 'default'} className="" >
           {props.buttonText ?? ''}
         </Button>
       </Dialog.Trigger>
