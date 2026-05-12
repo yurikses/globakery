@@ -9,12 +9,13 @@ interface ModalProps {
   description?: string
   children?: React.ReactNode
   buttonText?: string
+  className?: string
 }
 
 export function ModalWindow(props: ModalProps) {
   return (
     <Dialog.Root open={props.open} onOpenChange={props.onOpenChange}>
-      <Dialog.Trigger asChild>
+      <Dialog.Trigger asChild className={props.className}>
         <Button variant="primary" className="">
           {props.buttonText ?? ''}
         </Button>
@@ -23,7 +24,7 @@ export function ModalWindow(props: ModalProps) {
         <Dialog.Overlay className="fixed inset-0 backdrop-blur-md" />
         <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md bg-surface p-6 w-full max-w-md">
           {props.title && (
-            <Dialog.Title className="text-text font-semibold  mb-4 flex justify-between items-center">
+            <Dialog.Title className="text-text font-semibold  flex justify-between items-center">
               {props.title}
               <Button variant='ghost' size='icon' className='p-2 ' onClick={()=>props.onOpenChange(false)}>
                 <X className='size-6'/>
@@ -32,7 +33,7 @@ export function ModalWindow(props: ModalProps) {
           )}
 
           {props.description && (
-            <Dialog.Description className="text-text-2 mt-2 font-semibold text-sm">
+            <Dialog.Description className="text-text-2  font-semibold text-sm">
               {props.description}
             </Dialog.Description>
           )}

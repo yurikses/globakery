@@ -3,9 +3,11 @@ import { AccentCard } from '#/components/ui/accent-card'
 import type { BadgeVariants } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
-import { Table  } from '#/components/ui/table'
-import type {TableHeader} from '#/components/ui/table';
+import { ModalWindow } from '#/components/ui/modal'
+import { Table } from '#/components/ui/table'
+import type { TableHeader } from '#/components/ui/table'
 import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/dashboard/users')({
   component: RouteComponent,
@@ -45,6 +47,8 @@ const usersData: UserData[] = [
 ]
 
 function RouteComponent() {
+  const [showNewUser, setShowNewUser] = useState(false)
+
   return (
     <div className="flex flex-col gap-4 p-4">
       <PageTitle
@@ -76,12 +80,36 @@ function RouteComponent() {
       </div>
 
       <div className="flex items-center gap-2 w-full justify-end">
+        <ModalWindow
+          open={showNewUser}
+          onOpenChange={setShowNewUser}
+          title="Добавление пользователя"
+          description="Введите данные нового пользователя"
+          buttonText='+ Добавить пользователя'
+          className='mr-auto'
+        >
+          <form className='flex flex-col gap-2 mt-4'>
+            <Input placeholder='Иванов И.И.' label='ФИО пользователя' />
+            <Input placeholder='example@mail.ru' label='Email пользователя' type='email' />
+            <Input label='Пароль пользователя' type='password' />
+
+            <div className='flex gap-2 mt-4 ml-auto'>
+              <Button variant='secondary' type='button' onClick={()=>setShowNewUser(false)}>Отмена</Button>
+              <Button variant='primary' type='submit'>Добавить</Button>
+            </div>
+            
+          </form>
+        </ModalWindow>
         <Input className="w-120" placeholder="Поиск пользователя" />
         <Button variant="primary">Найти</Button>
       </div>
 
       <div>
-        <Table headers={usersHeaders as any} actions="all" data={usersData as any} />
+        <Table
+          headers={usersHeaders as any}
+          actions="all"
+          data={usersData as any}
+        />
       </div>
     </div>
   )
