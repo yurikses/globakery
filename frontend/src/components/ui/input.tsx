@@ -5,24 +5,30 @@ import type { ClassValue } from 'tailwind-variants'
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string
+  containerClassName: string
 }
 
-export function Input({ className, label, error,  ...props }: InputProps) {
+export function Input({
+  className,
+  label,
+  error,
+  containerClassName,
+  ...props
+}: InputProps) {
   const inputStyle: ClassValue =
     'border border-border text-sm bg-surface rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50'
 
   return (
-    <label className='flex flex-col gap-0.5'>
-      { label && <span className="block text-xs  text-text-2 font-semibold mb-1 uppercase tracking-wide">{label}</span> }
+    <label className={cn(containerClassName, 'flex flex-col gap-0.5 ')}>
+      {label && (
+        <span className="block text-xs  text-text-2 font-semibold mb-1 uppercase tracking-wide">
+          {label}
+        </span>
+      )}
       <input className={cn(inputStyle, className)} {...props} />
-      { error && <span className="block text-xs text-red-600 mt-0.5">{error}</span> }
+      {error && (
+        <span className="block text-xs text-red-600 mt-0.5">{error}</span>
+      )}
     </label>
   )
-}
-
-
-export function MultiInput() {
-
-
-  return
 }

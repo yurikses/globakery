@@ -37,8 +37,10 @@ export function ModalWindow(props: ModalProps) {
               {props.description}
             </Dialog.Description>
           )}
-
+          
           {props.children}
+          
+          
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

@@ -1,12 +1,14 @@
 import { AppHeader } from '#/components/header'
-import { PageTitle } from '#/components/page-title';
-import { Button } from '#/components/ui/button';
-import { Input } from '#/components/ui/input';
-import { ModalWindow } from '#/components/ui/modal';
-import { Table  } from '#/components/ui/table'
-import type {TableHeader} from '#/components/ui/table';
+import { PageTitle } from '#/components/page-title'
+import { Button } from '#/components/ui/button'
+import { Input } from '#/components/ui/input'
+import { ModalWindow } from '#/components/ui/modal'
+import { SelectMenu } from '#/components/ui/select'
+import { Table } from '#/components/ui/table'
+import type { TableHeader } from '#/components/ui/table'
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react';
+import { X } from 'lucide-react'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/dashboard/products')({
   component: RouteComponent,
@@ -19,14 +21,15 @@ const productHeaders: TableHeader[] = [
   { name: 'Рецептура', type: 'text', accessorKey: 'recipe' },
 ]
 
-function RouteComponent() {
+const ingredients = [{ value: 'sugar', text: 'Сахар' }]
 
+function RouteComponent() {
   const [showNewProduct, setShowNewProduct] = useState(false)
-  
+
   return (
     <div className="flex flex-col ">
       <AppHeader />
-      
+
       <div className="flex flex-col gap-2 p-4">
         <PageTitle
           title="Изделия"
@@ -38,17 +41,24 @@ function RouteComponent() {
             onOpenChange={setShowNewProduct}
             title="Добавление изделия"
             description="Введите данные нового изделия"
-            buttonText='+ Добавить изделие'
-            className='mr-auto'
+            buttonText="+ Добавить изделие"
+            className="mr-auto"
           >
-            <form className='flex flex-col gap-2 mt-4'>
-              <Input placeholder='Хлеб белый' label='Название' />
-              
-              <div className='flex gap-2 mt-4 ml-auto'>
-                <Button variant='secondary' type='button' onClick={()=>setShowNewProduct(false)}>Отмена</Button>
-                <Button variant='primary' type='submit'>Добавить</Button>
+            <form className="flex flex-col gap-2 mt-4">
+              <Input placeholder="Хлеб белый" label="Название" />
+              <RecipeList />
+              <div className="flex gap-2 mt-4 ml-auto">
+                <Button
+                  variant="secondary"
+                  type="button"
+                  onClick={() => setShowNewProduct(false)}
+                >
+                  Отмена
+                </Button>
+                <Button variant="primary" type="submit">
+                  Добавить
+                </Button>
               </div>
-              
             </form>
           </ModalWindow>
           <Input className="w-120" placeholder="Поиск изделия" />
@@ -58,6 +68,80 @@ function RouteComponent() {
           <Table headers={productHeaders} />
         </div>
       </div>
+    </div>
+  )
+}
+
+function RecipeList() {
+  const [ingredients, setIngredients] = useState<
+    { id: string; name: string | null; value: number | null }[]
+  >([])
+
+  function addIngredient() {
+    setIngredients((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), name: null, value: null },
+    ])
+  }
+
+  function deleteIngredient(id: string) {
+    setIngredients((prev) => prev.filter((a) => a.id != id))
+  }
+
+  return (
+    <div>
+      <h2 className="text-text-2 uppercase font-semibold tracking-wider text-xs mb-1">
+        Список ингредиентов
+      </h2>
+      <div className="flex flex-col gap-3">
+        {ingredients.map((ingredient) => (
+          <RecipeItem
+            key={ingredient.id}
+            recipe={ingredient}
+            onDelete={() => deleteIngredient(ingredient.id)}
+          />
+        ))}
+        <Button
+          variant="secondary"
+          size="default"
+          type="button"
+          onClick={() => addIngredient()}
+        >
+          Добавить ингредиент
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+interface RecipeItemProps {
+  recipe: { name: string | null; value: number | null }
+  onDelete: () => void
+}
+
+function RecipeItem(props: RecipeItemProps) {
+  return (
+    <div className="flex gap-3 items-center">
+      <SelectMenu
+        options={ingredients}
+        selectedValue={props.recipe.name ?? undefined}
+        placeholder="Ингредиент"
+        size="sm"
+      />
+      <Input
+        type="number"
+        defaultValue={props.recipe.value ?? undefined}
+        containerClassName="flex-1"
+      />
+      <Button
+        type="button"
+        variant="danger"
+        size="icon"
+        className="size-6"
+        onClick={props.onDelete}
+      >
+        <X />
+      </Button>
     </div>
   )
 }
