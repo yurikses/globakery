@@ -1,0 +1,13 @@
+{
+  "name": "globakery",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "bun --cwd backend run dev & bun --cwd frontend run dev",
+    "build": "bun --cwd backend run build && bun --cwd frontend run build"
+  }
+}
