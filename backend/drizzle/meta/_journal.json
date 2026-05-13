@@ -15,6 +15,13 @@
       "when": 1778599270652,
       "tag": "0001_majestic_absorbing_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1778680991018,
+      "tag": "0002_slippery_maestro",
+      "breakpoints": true
     }
   ]
 }

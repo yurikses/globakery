@@ -1,16 +1,109 @@
-import { pgTable,serial, integer, pgEnum, varchar, text, timestamp } from "drizzle-orm/pg-core"
-import { factory } from "./factory"
+import {
+  pgTable,
+  integer,
+  pgEnum,
+  text,
+  timestamp,
+  boolean,
+  index,
+  AnyPgColumn,
+} from "drizzle-orm/pg-core";
+import { factory } from "./factory";
+import { relations } from "drizzle-orm";
 
-export const rolesEnum = pgEnum("role", ["admin", "director", "employee"])
+export const rolesEnum = pgEnum("role", ["admin", "director", "employee"]);
 
 export const user = pgTable("user", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", {length: 30}).notNull(),
-  email: varchar("email", {length: 50}).notNull(),
-  password: text("password").notNull(),
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  image: text("image"),
   role: rolesEnum("role").notNull(),
-  factoryId: integer("factory_id").references(() => factory.id),
+  // Используем AnyPgColumn чтобы разорвать циклическую зависимость типов TypeScript
+  factoryId: integer("factory_id").references((): AnyPgColumn => factory.id),
   contacts_info: text("contacts_info"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").$onUpdate(()=> new Date()),
-})
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at")
+    // Явно указываем тип возвращаемого значения для $onUpdate
+    .$onUpdate((): Date => new Date())
+    .notNull(),
+});
+
+export const session = pgTable(
+  "session",
+  {
+    id: text("id").primaryKey(),
+    expiresAt: timestamp("expires_at").notNull(),
+    token: text("token").notNull().unique(),
+    createdAt: timestamp("created_at").notNull(),
+    updatedAt: timestamp("updated_at")
+      .$onUpdate((): Date => new Date())
+      .notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+  },
+  (table) => [index("session_userId_idx").on(table.userId)],
+);
+
+export const account = pgTable(
+  "account",
+  {
+    id: text("id").primaryKey(),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at"),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+    scope: text("scope"),
+    password: text("password"),
+    createdAt: timestamp("created_at").notNull(),
+    updatedAt: timestamp("updated_at")
+      .$onUpdate((): Date => new Date())
+      .notNull(),
+  },
+  (table) => [index("account_userId_idx").on(table.userId)],
+);
+
+export const verification = pgTable(
+  "verification",
+  {
+    id: text("id").primaryKey(),
+    identifier: text("identifier").notNull(),
+    value: text("value").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdAt: timestamp("created_at").notNull(),
+    updatedAt: timestamp("updated_at")
+      .$onUpdate((): Date => new Date())
+      .notNull(),
+  },
+  (table) => [index("verification_identifier_idx").on(table.identifier)],
+);
+
+export const userRelations = relations(user, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id],
+  }),
+}));
+
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id],
+  }),
+}));

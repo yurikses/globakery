@@ -2,11 +2,13 @@ import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import {
   GetAllUsers,
   GetUserById,
-  CreateUser,
   UpdateUser,
   DeleteUser,
+  UpdatePassword,
 } from "../services/user.service";
 import { rolesEnum } from "../db/schema/user";
+import { requireAuth } from "../middleware/auth";
+import { PgRole } from "drizzle-orm/pg-core";
 
 export const userRouter = new OpenAPIHono();
 
@@ -14,14 +16,12 @@ export const userRouter = new OpenAPIHono();
 
 const UserSchema = z
   .object({
-    id: z.number().openapi({ example: 1 }),
+    id: z.string().openapi({ example: 1 }),
     name: z.string().openapi({ example: "John Doe" }),
     email: z.string().email().openapi({ example: "john@example.com" }),
     role: z.enum(rolesEnum.enumValues).openapi({ example: "employee" }),
     factoryId: z.number().nullable().optional(),
     contacts_info: z.string().nullable().optional(),
-    createdAt: z.string().or(z.date()).optional(),
-    updatedAt: z.string().or(z.date()).nullable().optional(),
   })
   .openapi("User");
 
@@ -42,7 +42,6 @@ const UpdateUserSchema = z
       .max(50)
       .optional()
       .openapi({ example: "john.smith@example.com" }),
-    password: z.string().min(6).optional().openapi({ example: "newsecret" }),
     role: z.enum(rolesEnum.enumValues).optional().openapi({ example: "admin" }),
   })
   .openapi("UpdateUserRequest");
@@ -157,7 +156,7 @@ userRouter.openapi(getUsersRoute, async (c) => {
 
 userRouter.openapi(getUserByIdRoute, async (c) => {
   const { id } = c.req.valid("param");
-  const users = await GetUserById(Number(id));
+  const users = await GetUserById(id);
 
   if (!users.length) {
     return c.text("User not found", 404);
@@ -166,25 +165,25 @@ userRouter.openapi(getUserByIdRoute, async (c) => {
   return c.json(users[0], 200);
 });
 
-userRouter.openapi(createUserRoute, async (c) => {
-  const { name, email, password } = c.req.valid("json");
 
-  await CreateUser(name, email, password);
-  return c.text("User created", 201);
-});
+// userRouter.openapi(createUserRoute, async (c) => {
+//   const { name, email, password } = c.req.valid("json");
+
+//   await CreateUser(name, email, password);
+//   return c.text("User created", 201);
+// });
 
 userRouter.openapi(updateUserRoute, async (c) => {
   const { id } = c.req.valid("param");
-  const { name, email, password, role } = c.req.valid("json");
-
-  const result = await UpdateUser(Number(id), name, email, password, role);
+  const { name, email, role } = c.req.valid("json");
+  const result = await UpdateUser(id, name, email, role);
 
   return c.text("User updated", 200);
 });
 
 userRouter.openapi(deleteUserRoute, async (c) => {
   const { id } = c.req.valid("param");
-  await DeleteUser(Number(id));
+  await DeleteUser(id);
 
   return c.text("User deleted", 200);
 });

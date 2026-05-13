@@ -1,8 +1,9 @@
 import { db } from "../lib/db";
-import { rolesEnum, user } from "../db/schema/user";
+import { account, rolesEnum, user } from "../db/schema/user";
 import { eq } from "drizzle-orm";
+import { auth } from "../lib/auth";
 
-export function GetUserById(id: number) {
+export function GetUserById(id: string) {
   return db.select().from(user).where(eq(user.id, id));
 }
 
@@ -10,17 +11,6 @@ export function GetUserByEmail(email: string) {
   return db.select().from(user).where(eq(user.email, email));
 }
 
-
-export async function CreateUser(name: string, email: string, password: string) {
-  const hash = await Bun.password.hash(password);
-  
-  return db.insert(user).values({
-    name,
-    email,
-    password: hash,
-    role: "employee",
-  });
-}
 
 export function GetAllUsers() {
   return db.select().from(user);
@@ -30,10 +20,9 @@ export function GetAllUsers() {
 type RoleType = (typeof rolesEnum.enumValues)[number];
 
 export function UpdateUser(
-  id: number,
+  id: string,
   name?: string,
   email?: string,
-  password?: string,
   role?: RoleType,
 ) {
   return db
@@ -41,13 +30,21 @@ export function UpdateUser(
     .set({
       name,
       email,
-      password,
       role,
     })
     .where(eq(user.id, id))
     .returning();
 }
 
-export function DeleteUser(id: number) {
+export function UpdatePassword(currentPassword: string, newPassword: string) {
+  return auth.api.changePassword({
+    body: {
+      currentPassword,
+      newPassword,
+    },
+  });
+}
+
+export function DeleteUser(id: string) {
   return db.delete(user).where(eq(user.id, id));
 }
